@@ -7,6 +7,22 @@ var customerID = []; // Array to store customer IDs
 var customerAddressID = []; // Array to store customer address IDs
 var invoiceOutput = document.getElementById("invoice-output"); // HTML element for displaying invoice lines
 var invoiceErrors = document.getElementById("errors"); // HTML element for displaying invoice errors
+var errorsExport = []; // Array to store errors for export
+
+// When export button is clicked...
+function exportErrors(filename, text){
+	// create new "a" element to trigger download
+	let element = document.createElement("a");
+	element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+	element.setAttribute("download", filename);
+	// Hide clickable element
+	element.style.display = "none";
+	document.body.appendChild(element);
+	// Trigger download
+	element.click();
+	// Delete element
+	document.body.removeChild(element);
+}
 
 // On customer file upload...
 function submitCustomers(){
@@ -130,10 +146,8 @@ function outputErrors(){
 function doesClientExist(){
 	for(let i = 0; i < invoicesProcessed.data.length; i++){
 		if(customerID.indexOf(invoicesProcessed.data[i][1]) < 0){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - No customer (" + invoicesProcessed.data[i][1] + ") in database at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "No customer in Oracle", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
@@ -143,10 +157,8 @@ function doesClientExist(){
 function doesOfficeExist(){
 	for(let i = 0; i < invoicesProcessed.data.length; i++){
 		if(customerAddressID.indexOf(invoicesProcessed.data[i][3]) < 0){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - No office (" + invoicesProcessed.data[i][3] + ") in database at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "No customer office", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
@@ -156,10 +168,8 @@ function doesOfficeExist(){
 function hasCostCode(){	
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		if(invoicesProcessed.data[i].length < 16){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - No Cost Code at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "No Cost Code at line", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 			// Add 3 temporary fields to the array to prevent further errors
 			for(let y = 0; y < 3; y++){
 				invoicesProcessed.data[i].splice(6, 0, "");
@@ -175,10 +185,8 @@ function hasInvoicePrefix(){
 		// Use Regex to verify string starts with 5 characters
 		var prefixRegex = /^[a-z][a-z][a-z][a-z][a-z]/i;
 		if(!invoicesProcessed.data[i][4].match(prefixRegex)){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - No Divisional Prefix at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "No Divisional Prefix", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
@@ -189,17 +197,13 @@ function descriptionLength(){
 	// Description is greater than 180 characters
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		if(invoicesProcessed.data[i][11].length > 180){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - Description too long at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "Description too long", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 		}
 		// Description is blank
 		if(invoicesProcessed.data[i][11] == ""){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - Description null at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "Description is null", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
@@ -210,10 +214,8 @@ function hasTaxCode(){
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		// No VAT Rate added
 		if(!invoicesProcessed.data[i][13]){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - No Tax Code at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "No tax code", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
@@ -224,10 +226,18 @@ function taxValue(){
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		// If there is no tax whilst there is value
 		if(invoicesProcessed.data[i][14] == "0.00" && invoicesProcessed.data[i][12] != "0.00"){
-			// Create new elements in the DOM to output errors
-			let node = document.createElement("li");
-			node.innerHTML = "Invoice " + invoicesProcessed.data[i][4] + " in file " + fileInput.files[0].name + " - Zero Tax Value at line " + (i + 1) + "<br><em>Invoice Line: " + invoicesProcessed.data[i].join("|") + "</em>"; 
-			invoiceErrors.appendChild(node);
+			// Print the error
+			errorFound(invoicesProcessed.data[i][4], "Zero tax value", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
+}
+
+// Print errors
+function errorFound(invoiceRef, errorReason, errorLine, fileName, invoiceLine){
+	// Create new elements in DOM to output errors
+	let node = document.createElement("li");
+	node.innerHTML = "Invoice " + invoiceRef + " in file " + fileName + " - " + errorReason + " at line " + errorLine + "<br><em>Invoice Line: " + invoiceLine + "</em>"; 
+	invoiceErrors.appendChild(node);
+	// Add failed invoice line to export array
+	errorsExport.push("Invoice " + invoiceRef + " in file " + fileName + " - " + errorReason + " at line " + errorLine + "\n Invoice Line: " + invoiceLine + " \n");
 }
