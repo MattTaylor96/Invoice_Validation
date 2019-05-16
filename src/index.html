@@ -3,6 +3,7 @@
 <head>
 <title>Invoice Validaiton</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 <style>
@@ -58,18 +59,35 @@
 
 <div class="container text-center text-success">
 	<h3>Invoice Lines</h3>
-	<code class="text-success"><div class="text-left">
-		<ol id="invoice-output"></ol>
-	</div></code>
+	<div class="text-left">
+		<table class="table table-striped" id="invoice-output">
+			<thead class="thead-light">
+			</tr>
+				<th>#</th>
+				<th>Invoice Line</th>
+			</tr>
+			</thead>
+		</table>
+	</div>
 </div>
 
 <hr>
 
 <div class="container text-center text-danger">
 	<h3>Invoice Errors</h3>
-	<code class="text-danger"><div class="text-left">
-		<ol id="errors"></ol>
-	</div></code>
+	<div class="text-left">
+		<table class="table table-striped" id="errors">
+			<thead class="thead-dark">
+			<tr>
+				<th>Invoice Ref</th>
+				<th>Error Description</th>
+				<th>Error Line</th>
+				<th>File Name</th>
+				<th>Invoice Line</th>
+			</tr>
+			</thead>
+		</table>
+	</div>
 </div>
 
 
