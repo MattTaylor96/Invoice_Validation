@@ -69,7 +69,7 @@ function submitFile(){
 	}
 	// If no customer file is entered...
 	if(!customerInput.files[0]){
-		if(!customerID == []){
+		if(customerID == []){
 			// Alert and return to prevent errors
 			alert("No customers in the database. Please upload a customer file first");
 			return
