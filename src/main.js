@@ -3,12 +3,21 @@ var fileInput = document.getElementById("file-input"); // Invoice file uploaded
 var customerInput = document.getElementById("customer-input"); // Customer file uploaded
 var invoicesProcessed; // Invoices in JSON format
 var customersProcessed; // Customers in JSON format
-var customerID = []; // Array to store customer IDs 
-var customerAddressID = []; // Array to store customer address IDs
+var customerID = JSON.parse(localStorage.getItem("customerIDs")); // Array to store customer IDs 
+var customerAddressID = JSON.parse(localStorage.getItem("addressIDs")); // Array to store customer address IDs
 var invoiceOutput = document.getElementById("invoice-output"); // HTML element for displaying invoice lines
 var invoiceErrors = document.getElementById("errors"); // HTML element for displaying invoice errors
 var errorsExport = []; // Array to store errors for export
 var count = 1; // Counter for invoice output
+
+// Check whether there is a value in local storage
+if(!customerID){
+	customerID = [];
+}
+// Check whether there is a value in local storageh
+if(!customerAddressID){
+	customerAddressID = [];
+}
 
 // When export button is clicked...
 function exportErrors(filename, text){
@@ -36,9 +45,11 @@ function submitCustomers(){
 	// Parse customer data (PapaParse)
 	Papa.parse(customerInput.files[0], {
 		// PapaParse config - callback for results
+		delimiter: "|",
 		complete: function(results) {
 			// Store JSON in variable and allocate
 			customersProcessed = results;
+			console.log(customersProcessed);
 			allocateCustomers();
 			// Create new elements in the DOM to show files
 			let node = document.createElement("li");
@@ -58,9 +69,11 @@ function submitFile(){
 	}
 	// If no customer file is entered...
 	if(!customerInput.files[0]){
-		// Alert and return to prevent errors
-		alert("Please upload a customer file first")
-		return
+		if(!customerID == []){
+			// Alert and return to prevent errors
+			alert("No customers in the database. Please upload a customer file first");
+			return
+		}
 	}
 	// Parse the data (return through a callback due to asynchronous parsing)
 	Papa.parse(fileInput.files[0], {
@@ -115,6 +128,9 @@ function allocateCustomers(){
 		if(customerAddressID.indexOf(customersProcessed.data[i][4]) < 0){
 			customerAddressID.push(customersProcessed.data[i][4]);
 		}
+		
+		localStorage.setItem("customerIDs", JSON.stringify(customerID));
+		localStorage.setItem("addressIDs", JSON.stringify(customerAddressID));
 	}
 }
 
