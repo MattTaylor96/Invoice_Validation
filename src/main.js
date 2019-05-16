@@ -69,8 +69,9 @@ function submitFile(){
 	}
 	// If no customer file is entered...
 	if(!customerInput.files[0]){
-		if(customerID == []){
+		if(customerID.length < 1){
 			// Alert and return to prevent errors
+			console.log(customerID);
 			alert("No customers in the database. Please upload a customer file first");
 			return
 		}
@@ -130,7 +131,7 @@ function allocateCustomers(){
 		if(customerAddressID.indexOf(customersProcessed.data[i][4]) < 0){
 			customerAddressID.push(customersProcessed.data[i][4]);
 		}
-		
+		// Store data in local storage
 		localStorage.setItem("customerIDs", JSON.stringify(customerID));
 		localStorage.setItem("addressIDs", JSON.stringify(customerAddressID));
 	}
