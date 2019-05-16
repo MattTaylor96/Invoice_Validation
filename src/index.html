@@ -8,6 +8,7 @@
 <style>
 	#clear-btn{width: 100%;}
 	#hide-btn{width: 100%;}
+	#export-btn{width: 100%;}
 	.hidden{display: none;}
 </style>
 
@@ -49,6 +50,8 @@
 	<button type="button" class="btn btn-danger" id="clear-btn" onclick="clearPage()">Clear All Lines and Errors</button>
 	<br><br>
 	<button type="button" class="btn btn-primary" id="hide-btn" onclick="hideLines()">Toggle Invoice Lines</button>
+	<br><br>
+	<button type="button" class="btn btn-success" id="export-btn" onclick="exportErrors('errors.txt', errorsExport.join('\n'))">Export Errors</button>
 </div>
 
 <br>
