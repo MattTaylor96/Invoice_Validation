@@ -8,6 +8,7 @@ var customerAddressID = []; // Array to store customer address IDs
 var invoiceOutput = document.getElementById("invoice-output"); // HTML element for displaying invoice lines
 var invoiceErrors = document.getElementById("errors"); // HTML element for displaying invoice errors
 var errorsExport = []; // Array to store errors for export
+var count = 1; // Counter for invoice output
 
 // When export button is clicked...
 function exportErrors(filename, text){
@@ -63,6 +64,7 @@ function submitFile(){
 	}
 	// Parse the data (return through a callback due to asynchronous parsing)
 	Papa.parse(fileInput.files[0], {
+		delimiter: "|",
 		complete: function(results) {
 			// Output invoice lines and validate data
 			invoicesProcessed = results;
@@ -122,12 +124,16 @@ function outputInvoices(){
 	for(let i = 0; i < invoicesProcessed.data.length; i++){
 		// Join array with original delimiter for readability
 		invoiceLine = invoicesProcessed.data[i].join("|");
-		// Create new elements in the DOM to output all invoice lines
-		let node = document.createElement("li");
-		node.innerHTML = invoiceLine;
-		invoiceOutput.appendChild(node);
+		// Create a new row in the table
+		let row = invoiceOutput.insertRow();
+		let firstCell = row.insertCell(0);
+		let secondCell = row.insertCell(1);
+		// Assign cell value
+		firstCell.innerHTML = count;
+		secondCell.innerHTML = invoiceLine;
+		// increment counter
+		count ++;
 	}
-	
 }
 
 // Validate invoice data
@@ -234,10 +240,19 @@ function taxValue(){
 
 // Print errors
 function errorFound(invoiceRef, errorReason, errorLine, fileName, invoiceLine){
-	// Create new elements in DOM to output errors
-	let node = document.createElement("li");
-	node.innerHTML = "Invoice " + invoiceRef + " in file " + fileName + " - " + errorReason + " at line " + errorLine + "<br><em>Invoice Line: " + invoiceLine + "</em>"; 
-	invoiceErrors.appendChild(node);
+	// Create a new row in the table
+	let row = invoiceErrors.insertRow();
+	let firstCell = row.insertCell(0);
+	let secondCell = row.insertCell(1);
+	let thirdCell = row.insertCell(2);
+	let fourthCell = row.insertCell(3);
+	let fifthCell = row.insertCell(4);
+	// Assign cell value
+	firstCell.innerHTML = invoiceRef;
+	secondCell.innerHTML = errorReason;
+	thirdCell.innerHTML = errorLine;
+	fourthCell.innerHTML = fileName;
+	fifthCell.innerHTML = invoiceLine;
 	// Add failed invoice line to export array
 	errorsExport.push("Invoice " + invoiceRef + " in file " + fileName + " - " + errorReason + " at line " + errorLine + "\n Invoice Line: " + invoiceLine + " \n");
 }
