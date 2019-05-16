@@ -75,20 +75,22 @@ function submitFile(){
 			return
 		}
 	}
-	// Parse the data (return through a callback due to asynchronous parsing)
-	Papa.parse(fileInput.files[0], {
-		delimiter: "|",
-		complete: function(results) {
-			// Output invoice lines and validate data
-			invoicesProcessed = results;
-			outputInvoices();
-			outputErrors();			
-			// Create new elements in the DOM to show files
-			let node = document.createElement("li");
-			node.innerHTML = fileInput.files[0].name; 
-			document.getElementById("invoice-files").appendChild(node);
-		}
-	});	
+	for(let a = 0; a < fileInput.files.length; a++){
+		// Parse the data (return through a callback due to asynchronous parsing)
+		Papa.parse(fileInput.files[a], {
+			delimiter: "|",
+			complete: function(results) {
+				// Output invoice lines and validate data
+				invoicesProcessed = results;
+				outputInvoices();
+				outputErrors(a);			
+				// Create new elements in the DOM to show files
+				let node = document.createElement("li");
+				node.innerHTML = fileInput.files[a].name; 
+				document.getElementById("invoice-files").appendChild(node);
+			}
+		});	
+	}
 }
 
 // Remove all invoice data from the page
@@ -153,45 +155,45 @@ function outputInvoices(){
 }
 
 // Validate invoice data
-function outputErrors(){
-	hasCostCode();
-	doesClientExist();
-	doesOfficeExist();
-	hasInvoicePrefix();
-	descriptionLength();
-	hasTaxCode();
-	taxValue();
+function outputErrors(file){
+	hasCostCode(file);
+	doesClientExist(file);
+	doesOfficeExist(file);
+	hasInvoicePrefix(file);
+	descriptionLength(file);
+	hasTaxCode(file);
+	taxValue(file);
 }
 
 // Does Client Exist
 // Invoice Field 2 [1]
-function doesClientExist(){
+function doesClientExist(file){
 	for(let i = 0; i < invoicesProcessed.data.length; i++){
 		if(customerID.indexOf(invoicesProcessed.data[i][1]) < 0){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "No customer in Oracle", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "No customer in Oracle", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
 
 // Does Office Exist
 // Invoice Field 4 [3]
-function doesOfficeExist(){
+function doesOfficeExist(file){
 	for(let i = 0; i < invoicesProcessed.data.length; i++){
 		if(customerAddressID.indexOf(invoicesProcessed.data[i][3]) < 0){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "No customer office", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "No customer office", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
 
 // Is Cost Code Valid
 // Invoice Field 7 [6]
-function hasCostCode(){	
+function hasCostCode(file){	
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		if(invoicesProcessed.data[i].length < 16){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "No Cost Code at line", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "No Cost Code at line", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 			// Add 3 temporary fields to the array to prevent further errors
 			for(let y = 0; y < 3; y++){
 				invoicesProcessed.data[i].splice(6, 0, "");
@@ -202,54 +204,54 @@ function hasCostCode(){
 
 // Has Invoice Prefix (Invoice should be prefixed with 5 characters)
 // Invoice Field 5 [4]
-function hasInvoicePrefix(){
+function hasInvoicePrefix(file){
 	for(let i = 0; i < invoicesProcessed.data.length; i++){
 		// Use Regex to verify string starts with 5 characters
 		var prefixRegex = /^[a-z][a-z][a-z][a-z][a-z]/i;
 		if(!invoicesProcessed.data[i][4].match(prefixRegex)){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "No Divisional Prefix", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "No Divisional Prefix", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
 
 // Description Length
 // Invoice Field [11]
-function descriptionLength(){
+function descriptionLength(file){
 	// Description is greater than 180 characters
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		if(invoicesProcessed.data[i][11].length > 180){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "Description too long", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "Description too long", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 		// Description is blank
 		if(invoicesProcessed.data[i][11] == ""){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "Description is null", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "Description is null", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
 
 // Tax Code
 // Invoice Field [13]
-function hasTaxCode(){
+function hasTaxCode(file){
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		// No VAT Rate added
 		if(!invoicesProcessed.data[i][13]){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "No tax code", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "No tax code", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
 
 // Tax Value
 // Invoice Field [14]
-function taxValue(){
+function taxValue(file){
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		// If there is no tax whilst there is value
 		if(invoicesProcessed.data[i][14] == "0.00" && invoicesProcessed.data[i][12] != "0.00"){
 			// Print the error
-			errorFound(invoicesProcessed.data[i][4], "Zero tax value", (i + 1), fileInput.files[0].name, invoicesProcessed.data[i].join("|"));
+			errorFound(invoicesProcessed.data[i][4], "Zero tax value", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
