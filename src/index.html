@@ -1,1 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Invoice Validaiton</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
+<style>
+	#clear-btn{width: 100%;}
+	#hide-btn{width: 100%;}
+	.hidden{display: none;}
+</style>
+
+</head>
+<body>
+<div class="container text-center">
+	<h1 >Invoice Validation</h1>
+	<hr>
+	<p><strong>Please load the customer file</strong></p>
+	<form>
+		<input type="file" onchange="submitCustomers()" id="customer-input">
+		<button type="button" class="btn btn-primary" onclick="submitCustomers()">Submit File</button>
+	</form>
+	
+	<h3>Customer Files Processed</h3>
+	<code class="text-success"><div class="text-left">
+		<ol id="customer-files"></ol>
+	</div></code>
+
+	<hr>
+	
+	<p><strong>Please upload an invoice file to validate</strong></p>
+	<form>
+		<input type="file" onchange="submitFile()" id="file-input">
+		<button type="button" class="btn btn-primary" onclick="submitFile()">Submit File</button>
+	</form>
+</div>
+
+<div class="container text-center">
+	<h3>Invoice Files Processed</h3>
+	<code class="text-success"><div class="text-left">
+		<ol id="invoice-files"></ol>
+	</div></code>
+</div>
+
+<br>
+
+<div class="container text-center">
+	<button type="button" class="btn btn-danger" id="clear-btn" onclick="clearPage()">Clear All Lines and Errors</button>
+	<br><br>
+	<button type="button" class="btn btn-primary" id="hide-btn" onclick="hideLines()">Toggle Invoice Lines</button>
+</div>
+
+<br>
+
+<div class="container text-center text-success">
+	<h3>Invoice Lines</h3>
+	<code class="text-success"><div class="text-left">
+		<ol id="invoice-output"></ol>
+	</div></code>
+</div>
+
+<hr>
+
+<div class="container text-center text-danger">
+	<h3>Invoice Errors</h3>
+	<code class="text-danger"><div class="text-left">
+		<ol id="errors"></ol>
+	</div></code>
+</div>
+
+
+<script src="papa-parse.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
