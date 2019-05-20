@@ -21,10 +21,19 @@ if(!customerAddressID){
 
 // When export button is clicked...
 function exportErrors(filename, text){
+	// Timestamp the export
+	let date = new Date();
+	let month = date.getMonth() + 1;
+	if(month < 10){
+		month = "0" + month;
+	}
+	date = date.toString();
+	date = date.split(" ");
+	date = date[2] + month + date[3] + date[4].split(":").join("");
 	// create new "a" element to trigger download
 	let element = document.createElement("a");
 	element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
-	element.setAttribute("download", filename);
+	element.setAttribute("download", filename + date + ".txt");
 	// Hide clickable element
 	element.style.display = "none";
 	document.body.appendChild(element);
