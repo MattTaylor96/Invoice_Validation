@@ -171,6 +171,7 @@ function outputErrors(file){
 	doesOfficeExist(file);
 	hasInvoicePrefix(file);
 	descriptionLength(file);
+	invoiceValue(file);
 	hasTaxCode(file);
 	taxValue(file);
 }
@@ -228,9 +229,9 @@ function hasInvoicePrefix(file){
 // Description Length
 // Invoice Field [11]
 function descriptionLength(file){
-	// Description is greater than 180 characters
+	// Description is greater than 240 characters
 	for(let i=0; i < invoicesProcessed.data.length; i++){
-		if(invoicesProcessed.data[i][11].length > 180){
+		if(invoicesProcessed.data[i][11].length > 240){
 			// Print the error
 			errorFound(invoicesProcessed.data[i][4], "Description too long", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
@@ -238,6 +239,18 @@ function descriptionLength(file){
 		if(invoicesProcessed.data[i][11] == ""){
 			// Print the error
 			errorFound(invoicesProcessed.data[i][4], "Description is null", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
+		}
+	}
+}
+
+// Negative Invoice Value
+// Invoice Field [12]
+function invoiceValue(file){
+	// Invoice is negative
+	for(let i = 0; i < invoicesProcessed.data.length; i++){
+		if(invoicesProcessed.data[i][12] < 0){
+			// Print the error	
+			errorFound(invoicesProcessed.data[i][4], "Negative Value", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
