@@ -271,10 +271,21 @@ function hasTaxCode(file){
 // Invoice Field [14]
 function taxValue(file){
 	for(let i=0; i < invoicesProcessed.data.length; i++){
+		/* Removed for optimisation - see RegEx below
 		// If there is no tax whilst there is value
 		if(invoicesProcessed.data[i][14] == "0.00" && invoicesProcessed.data[i][12] != "0.00"){
 			// Print the error
 			errorFound(invoicesProcessed.data[i][4], "Zero tax value", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
+		}
+		*/
+		// If there is tax against a null tax rate
+		var nullTaxRates = /Exempt|Outside|Zero/i;
+		if(nullTaxRates.test(invoicesProcessed.data[i][13]) == true && invoicesProcessed.data[i][14] != "0.00" ){
+			errorFound(invoicesProcessed.data[i][4], "Incorrect Tax Code", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
+		}
+		// If there is a tax rate and invoice value, but no tax
+		if(nullTaxRates.test(invoicesProcessed.data[i][13]) == false && invoicesProcessed.data[i][14] == "0.00" && invoicesProcessed.data[i][12] != "0.00"){
+			errorFound(invoicesProcessed.data[i][4], "Zero Tax Value", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
