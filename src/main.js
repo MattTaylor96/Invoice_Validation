@@ -14,6 +14,7 @@ var count = 1; // Counter for invoice output
 if(!customerID){
 	customerID = [];
 }
+
 // Check whether there is a value in local storageh
 if(!customerAddressID){
 	customerAddressID = [];
@@ -49,7 +50,7 @@ function submitCustomers(){
 	if(!customerInput.files[0]){
 		// Alert and return to stop errors
 		alert("No File Uploaded");
-		return
+		return;
 	}
 	// Parse customer data (PapaParse)
 	Papa.parse(customerInput.files[0], {
@@ -74,7 +75,7 @@ function submitFile(){
 	if(!fileInput.files[0]){
 		// Alert and return to prevent errors
 		alert("No File Uploaded");
-		return
+		return;
 	}
 	// If no customer file is entered...
 	if(!customerInput.files[0]){
@@ -82,7 +83,7 @@ function submitFile(){
 			// Alert and return to prevent errors
 			console.log(customerID);
 			alert("No customers in the database. Please upload a customer file first");
-			return
+			return;
 		}
 	}
 	for(let a = 0; a < fileInput.files.length; a++){
@@ -129,12 +130,11 @@ function hideLines(){
 	invoiceOutput.classList.toggle("hidden");
 }
 
-
 function allocateCustomers(){
 	for(let i = 0; i < customersProcessed.data.length; i++){
 		// Move Customer reference into array if it doesn't already exist
 		if(customerID.indexOf(customersProcessed.data[i][1]) < 0){
-			customerID.push(customersProcessed.data[i][1]);;
+			customerID.push(customersProcessed.data[i][1]);
 		}
 		// Move Office reference into array if it doesn't already exist
 		if(customerAddressID.indexOf(customersProcessed.data[i][4]) < 0){
