@@ -16,12 +16,26 @@
 	.hidden{display: none;}
 	.white-text{color: #ecf0f1;}
 	tr{max-width: 100%;}
+	ul{list-style: none;}
+	#instructions{font-size: 22px; text-align: left; width: 60%; margin: auto;}
 </style>
 
 </head>
 <body>
 <div class="container text-center">
 	<h1 >Invoice Validation</h1>
+	<hr>
+	<button class="btn btn-primary" id="instruction-btn">Show Instructions for Use</button>
+	<div id="instructions" class="hidden">
+		<ol>
+			<li>Export all customers and upload the single file into the "Customer File" area below. If customer records already exist in local storage, only upload updated records).</li>
+			<li>Download invoice files and upload them in the "Invoice FIle" area below. (You can upload multiple files at once by selecting all the files and dragging them into the "Choose Files" box).</li>
+			<li>All the invoice lines will be displayed in the "Invoice Lines" section. This can be toggled using the "Toggle Invoice Lines" button.</li>
+			<li> Any errors will display in the "Invoice Errors" section. These errors can be exported into a .txt file using the "Export Errors" button.</li>
+			<li>Refresh the page and repeat the process with Credit Note files (You will not need to re-upload the customer file. Credit files can be run at the same time as invoices, but for clarity it is simpler to run them seperately).</li>
+
+		</ol>
+	</div>
 	<hr>
 	<p><strong>Please load the customer file</strong></p>
 	<form>
@@ -98,5 +112,6 @@
 
 <script src="papa-parse.js"></script>
 <script src="main.js"></script>
+<script src="instructions.js"></script>
 </body>
 </html>
