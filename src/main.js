@@ -15,13 +15,14 @@ if(!customerID){
 	customerID = [];
 }
 
-// Check whether there is a value in local storageh
+// Check whether there is a value in local storage
 if(!customerAddressID){
+	// Define blank array
 	customerAddressID = [];
 }
 
-// When export button is clicked...
-function exportErrors(filename, text){
+// Timestamp functionality for export
+function timestamp(){
 	// Timestamp the export
 	let date = new Date();
 	let month = date.getMonth() + 1;
@@ -31,16 +32,23 @@ function exportErrors(filename, text){
 	date = date.toString();
 	date = date.split(" ");
 	date = date[2] + month + date[3] + date[4].split(":").join("");
+	return date;
+}
+
+// When export button is clicked...
+function exportErrors(filename, text){
+	// Timestamp the export
+	let date = timestamp();
 	// create new "a" element to trigger download
 	let element = document.createElement("a");
 	element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
 	element.setAttribute("download", filename + date + ".txt");
-	// Hide clickable element
+	// Hide anchor element
 	element.style.display = "none";
 	document.body.appendChild(element);
 	// Trigger download
 	element.click();
-	// Delete element
+	// Delete anchor element
 	document.body.removeChild(element);
 }
 
@@ -164,7 +172,7 @@ function outputInvoices(){
 	}
 }
 
-// Validate invoice data
+// Validate invoice data (pass file down for error outputs)
 function outputErrors(file){
 	hasCostCode(file);
 	doesClientExist(file);
@@ -174,6 +182,7 @@ function outputErrors(file){
 	invoiceValue(file);
 	hasTaxCode(file);
 	taxValue(file);
+	//markupCharacter(file);
 }
 
 // Does Client Exist
@@ -244,7 +253,6 @@ function descriptionLength(file){
 }
 
 // Negative Invoice Value
-// Invoice Field [12]
 function invoiceValue(file){
 	// Invoice is negative
 	for(let i = 0; i < invoicesProcessed.data.length; i++){
@@ -256,7 +264,6 @@ function invoiceValue(file){
 }
 
 // Tax Code
-// Invoice Field [13]
 function hasTaxCode(file){
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		// No VAT Rate added
@@ -268,7 +275,6 @@ function hasTaxCode(file){
 }
 
 // Tax Value
-// Invoice Field [14]
 function taxValue(file){
 	for(let i=0; i < invoicesProcessed.data.length; i++){
 		/* Removed for optimisation - see RegEx below
@@ -289,6 +295,21 @@ function taxValue(file){
 		}
 	}
 }
+
+// Markup Characters
+// Code no longer necessary - Kept for potential future use...
+/*
+function markupCharacter(file){
+	for(let i = 0; i < invoicesProcessed.data.length; i++){
+		// Outline regularly occuring entities (params to test)
+		var markupChars = /<br>|&nbsp;|&amp;|;/i;
+		// If description contains any markupChars...
+		if(markupChars.test(invoicesProcessed.data[i][11])){
+			errorFound(invoicesProcessed.data[i][4], "HTML Characters Used in Line", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
+		}
+	}
+}
+*/
 
 // Print errors
 function errorFound(invoiceRef, errorReason, errorLine, fileName, invoiceLine){
