@@ -60,21 +60,24 @@ function submitCustomers(){
 		alert("No File Uploaded");
 		return;
 	}
-	// Parse customer data (PapaParse)
-	Papa.parse(customerInput.files[0], {
-		// PapaParse config - callback for results
-		delimiter: "|",
-		complete: function(results) {
-			// Store JSON in variable and allocate
-			customersProcessed = results;
-			console.log(customersProcessed);
-			allocateCustomers();
-			// Create new elements in the DOM to show files
-			let node = document.createElement("li");
-			node.innerHTML = customerInput.files[0].name; 
-			document.getElementById("customer-files").appendChild(node);
-		}
-	});
+	// For each customer file
+	for(let a = 0; a < customerInput.files.length; a++){
+		// Parse customer data (PapaParse)
+		Papa.parse(customerInput.files[a], {
+			// PapaParse config - callback for results
+			delimiter: "|",
+			complete: function(results) {
+				// Store JSON in variable and allocate
+				customersProcessed = results;
+				console.log(customersProcessed);
+				allocateCustomers();
+				// Create new elements in the DOM to show files
+				let node = document.createElement("li");
+				node.innerHTML = customerInput.files[a].name; 
+				document.getElementById("customer-files").appendChild(node);
+			}
+		});
+	}	
 }
 
 // On invoice file upload...
@@ -182,6 +185,7 @@ function outputErrors(file){
 	invoiceValue(file);
 	hasTaxCode(file);
 	taxValue(file);
+	hasExtraDelimiter(file);
 	//markupCharacter(file);
 }
 
@@ -292,6 +296,17 @@ function taxValue(file){
 		// If there is a tax rate and invoice value, but no tax
 		if(nullTaxRates.test(invoicesProcessed.data[i][13]) == false && invoicesProcessed.data[i][14] == "0.00" && invoicesProcessed.data[i][12] != "0.00"){
 			errorFound(invoicesProcessed.data[i][4], "Zero Tax Value", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
+		}
+	}
+}
+
+// Extra Delimiters
+function hasExtraDelimiter(file){
+	for(let i = 0; i < invoicesProcessed.data.length; i++)
+	{
+		// If there are too many delimiters (delimiters included in description field)
+		if(invoicesProcessed.data[i].length > 16){
+			errorFound(invoicesProcessed.data[i][4], "Too many delimiters in record", (i + 1), fileInput.files[file].name, invoicesProcessed.data[i].join("|"));
 		}
 	}
 }
